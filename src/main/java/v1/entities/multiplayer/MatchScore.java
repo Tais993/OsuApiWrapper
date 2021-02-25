@@ -121,19 +121,19 @@ public class MatchScore implements OsuEntity {
     public String toString() {
         return "MatchScore{" +
                 "\nslot=" + slot +
-                ", \nteam=" + team +
-                ", \nuserId=" + userId +
-                ", \nscore=" + score +
-                ", \nmaxCombo=" + maxCombo +
-                ", \ncount300=" + count300 +
-                ", \ncount100=" + count100 +
-                ", \ncount50=" + count50 +
-                ", \ncountMiss=" + countMiss +
-                ", \ncountKatu=" + countKatu +
-                ", \ncountGeki=" + countGeki +
-                ", \nhasPassed=" + hasPassed +
-                ", \nperfect=" + perfect +
-                ", \nmods=" + mods +
+                ",\n team=" + team +
+                ",\n userId=" + userId +
+                ",\n score=" + score +
+                ",\n maxCombo=" + maxCombo +
+                ",\n count300=" + count300 +
+                ",\n count100=" + count100 +
+                ",\n count50=" + count50 +
+                ",\n countMiss=" + countMiss +
+                ",\n countKatu=" + countKatu +
+                ",\n countGeki=" + countGeki +
+                ",\n hasPassed=" + hasPassed +
+                ",\n perfect=" + perfect +
+                ",\n mods=" + mods +
                 "\n}";
     }
 }

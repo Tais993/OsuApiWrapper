@@ -94,4 +94,20 @@ public class Game implements OsuEntity {
     public String getIdString() {
         return gameId + "";
     }
+
+    @Override
+    public String toString() {
+        return "Game{" +
+                "\ngameId=" + gameId +
+                ",\n startTime=" + startTime +
+                ",\n endTime=" + endTime +
+                ",\n beatmapId=" + beatmapId +
+                ",\n playMode=" + playMode +
+                ",\n matchType='" + matchType + '\'' +
+                ",\n scoringType=" + scoringType +
+                ",\n teamType=" + teamType +
+                ",\n mods=" + mods +
+                ",\n matchScores=" + matchScores +
+                "\n}";
+    }
 }

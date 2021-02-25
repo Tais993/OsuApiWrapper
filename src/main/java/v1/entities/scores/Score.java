@@ -153,22 +153,22 @@ public class Score implements OsuEntity {
     public String toString() {
         return "Score{" +
                 "\nscoreId=" + scoreId +
-                ", \nscore=" + score +
-                ", \nuserName='" + userName + '\'' +
-                ", \nuserId=" + userId +
-                ", \ncount300=" + count300 +
-                ", \ncount100=" + count100 +
-                ", \ncount50=" + count50 +
-                ", \ncountMiss=" + countMiss +
-                ", \nmaxCombo=" + maxCombo +
-                ", \ncountKatu=" + countKatu +
-                ", \ncountGeki=" + countGeki +
-                ", \nperfect=" + perfect +
-                ", \nmods=" + mods +
-                ", \ndateTime=" + dateTime +
-                ", \nrank=" + rank +
-                ", \npp=" + pp +
-                ", \nreplayAvailable=" + replayAvailable +
+                ",\n score=" + score +
+                ",\n userName='" + userName + '\'' +
+                ",\n userId=" + userId +
+                ",\n count300=" + count300 +
+                ",\n count100=" + count100 +
+                ",\n count50=" + count50 +
+                ",\n countMiss=" + countMiss +
+                ",\n maxCombo=" + maxCombo +
+                ",\n countKatu=" + countKatu +
+                ",\n countGeki=" + countGeki +
+                ",\n perfect=" + perfect +
+                ",\n mods=" + mods +
+                ",\n dateTime=" + dateTime +
+                ",\n rank=" + rank +
+                ",\n pp=" + pp +
+                ",\n replayAvailable=" + replayAvailable +
                 "\n}";
     }
 }

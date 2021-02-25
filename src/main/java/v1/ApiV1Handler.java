@@ -4,14 +4,17 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import v1.Futures.FutureImpl;
-import v1.Futures.SetFutureImpl;
+import futures.FutureImpl;
+import futures.SetFutureImpl;
+import osu.OsuSettings;
 import v1.entities.beatmap.Beatmap;
 import v1.entities.beatmap.BeatmapRequestBuilder;
 import v1.entities.bestperformance.BestPerformance;
 import v1.entities.bestperformance.BestPerformanceRequestBuilder;
 import v1.entities.multiplayer.Match;
 import v1.entities.multiplayer.MatchRequestBuilder;
+import v1.entities.replay.Replay;
+import v1.entities.replay.ReplayRequestBuilder;
 import v1.entities.scores.Score;
 import v1.entities.scores.ScoresRequestBuilder;
 import v1.entities.user.User;
@@ -29,11 +32,19 @@ import java.util.concurrent.*;
 public class ApiV1Handler {
     private final String key;
     public final static String startUrl = "https://osu.ppy.sh/api/";
-    private final ArrayBlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<>(100);
-    private final ExecutorService executorService = new ThreadPoolExecutor(1, 10, 100L, TimeUnit.SECONDS, blockingQueue);
+    private final ArrayBlockingQueue<Runnable> blockingQueue;
+    private final ExecutorService executorService;
 
-    public ApiV1Handler(String key) {
-        this.key = key;
+    public ApiV1Handler(OsuSettings osuS) {
+        this.key = osuS.getKeyV1();
+
+        if (osuS.useSeparateQueues()) {
+            this.blockingQueue = osuS.getV1Queue();
+            this.executorService = osuS.getV1Executor();
+        } else {
+            this.blockingQueue = osuS.getBlockingQueue();
+            this.executorService = osuS.getExecutorService();
+        }
     }
 
     public FutureImpl<Beatmap> retrieveBeatmap(BeatmapRequestBuilder beatmapRequestBuilder) {
@@ -120,17 +131,16 @@ public class ApiV1Handler {
         return new FutureImpl<>(callable, executorService);
     }
 
-//    public FutureImpl<Replay> retrieveReplay(ReplayRequestBuilder replayRequestBuilder) {
-//        Callable<Replay> callable = ()  -> {
-//
-//            replayRequestBuilder.setKey(key);
-//            System.out.println(replayRequestBuilder.getUrl());
-//
-//            return new Replay(getJsonObject(replayRequestBuilder.getUrl()));
-//        };
-//
-//        return new FutureImpl<>(callable, executorService);
-//    }
+    public FutureImpl<Replay> retrieveReplay(ReplayRequestBuilder replayRequestBuilder) {
+        Callable<Replay> callable = ()  -> {
+
+            replayRequestBuilder.setKey(key);
+
+            return new Replay(getJsonObject(replayRequestBuilder.getUrl()));
+        };
+
+        return new FutureImpl<>(callable, executorService);
+    }
 
     protected static JsonObject getJsonObject(String urlString) throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();

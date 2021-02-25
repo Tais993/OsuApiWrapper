@@ -16,7 +16,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class User implements OsuEntity {
-    private long userId;
+    private final long userId;
 
     private final String userName;
 
@@ -209,5 +209,33 @@ public class User implements OsuEntity {
     private LocalDateTime getDateTimeFromString(String timeAsString) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         return LocalDateTime.parse(timeAsString, formatter);
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "\nuserId=" + userId +
+                ",\n userName='" + userName + '\'' +
+                ",\n joinTime=" + joinTime +
+                ",\n count300=" + count300 +
+                ",\n count100=" + count100 +
+                ",\n count50=" + count50 +
+                ",\n playCount=" + playCount +
+                ",\n rankedScore=" + rankedScore +
+                ",\n totalScore=" + totalScore +
+                ",\n ppRank=" + ppRank +
+                ",\n level=" + level +
+                ",\n ppRaw=" + ppRaw +
+                ",\n accuracy=" + accuracy +
+                ",\n countRankSS=" + countRankSS +
+                ",\n countRankSSH=" + countRankSSH +
+                ",\n countRankS=" + countRankS +
+                ",\n countRankSH=" + countRankSH +
+                ",\n countRankA=" + countRankA +
+                ",\n country=" + country +
+                ",\n countryRank=" + countryRank +
+                ",\n totalSecondsPlayed=" + totalSecondsPlayed +
+                ",\n events=" + events +
+                "\n}";
     }
 }

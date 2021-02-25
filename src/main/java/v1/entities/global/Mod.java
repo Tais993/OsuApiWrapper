@@ -125,13 +125,6 @@ public enum Mod {
 
     @Override
     public String toString() {
-        return "Mod{" +
-                "\nbitwise=" + bitwise +
-                ", \ntitle='" + title + '\'' +
-                ", \nabbreviation='" + abbreviation + '\'' +
-                ", \nisKeyMod=" + isKeyMod +
-                ", \nallowsFreeMod=" + allowsFreeMod +
-                ", \nisScoreIncreaseMod=" + isScoreIncreaseMod +
-                '}';
+        return "\n title='" + title + "' \n";
     }
 }

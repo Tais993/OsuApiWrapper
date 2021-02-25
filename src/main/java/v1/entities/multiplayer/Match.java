@@ -54,4 +54,15 @@ public class Match implements OsuEntity {
     public String getIdString() {
         return matchId + "";
     }
+
+    @Override
+    public String toString() {
+        return "Match{" +
+                "\nmatchId=" + matchId +
+                ",\n name='" + name + '\'' +
+                ",\n startTime=" + startTime +
+                ",\n endTime=" + endTime +
+                ",\n games=" + games +
+                "\n}";
+    }
 }

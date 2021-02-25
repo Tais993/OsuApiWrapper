@@ -1,4 +1,4 @@
-package v1.Futures;
+package futures;
 
 import v1.entities.OsuEntity;
 
@@ -6,11 +6,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class ConvertedFuture<T extends OsuEntity, O> {
+public class OsuEntityFuture<T extends OsuEntity, O extends OsuEntity> {
     private final FutureImpl<T> asyncFuture;
     private final Function<T, ? extends O> converter;
 
-    public ConvertedFuture(FutureImpl<T> asyncFuture, Function<T, ? extends O> converter) {
+    public OsuEntityFuture(FutureImpl<T> asyncFuture, Function<T, ? extends O> converter) {
         this.asyncFuture = asyncFuture;
         this.converter = converter;
     }

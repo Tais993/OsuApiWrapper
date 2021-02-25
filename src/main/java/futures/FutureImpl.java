@@ -1,4 +1,4 @@
-package v1.Futures;
+package futures;
 
 import v1.entities.OsuEntity;
 

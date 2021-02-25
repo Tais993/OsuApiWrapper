@@ -141,22 +141,22 @@ public class BestPerformance implements OsuEntity {
     public String toString() {
         return "BestPerformance{" +
                 "\nbeatmapId=" + beatmapId +
-                ", \nscoreId=" + scoreId +
-                ", \nscore=" + score +
-                ", \nmaxCombo=" + maxCombo +
-                ", \ncount300=" + count300 +
-                ", \ncount100=" + count100 +
-                ", \ncount50=" + count50 +
-                ", \ncountMiss=" + countMiss +
-                ", \ncountKatu=" + countKatu +
-                ", \ncountGeki=" + countGeki +
-                ", \nperfect=" + perfect +
-                ", \nmods=" + mods +
-                ", \nuserId=" + userId +
-                ", \ndateTime=" + dateTime +
-                ", \nrank=" + rank +
-                ", \npp=" + pp +
-                ", \nreplayAvailable=" + replayAvailable +
+                ",\n scoreId=" + scoreId +
+                ",\n score=" + score +
+                ",\n maxCombo=" + maxCombo +
+                ",\n count300=" + count300 +
+                ",\n count100=" + count100 +
+                ",\n count50=" + count50 +
+                ",\n countMiss=" + countMiss +
+                ",\n countKatu=" + countKatu +
+                ",\n countGeki=" + countGeki +
+                ",\n perfect=" + perfect +
+                ",\n mods=" + mods +
+                ",\n userId=" + userId +
+                ",\n dateTime=" + dateTime +
+                ",\n rank=" + rank +
+                ",\n pp=" + pp +
+                ",\n replayAvailable=" + replayAvailable +
                 "\n}";
     }
 }
