@@ -1,12 +1,12 @@
 import osu.Osu;
 import osu.OsuSettingsBuilder;
-import v1.entities.beatmap.BeatmapRequestBuilder;
-import v1.entities.bestperformance.BestPerformanceRequestBuilder;
-import v1.entities.global.Mod;
-import v1.entities.multiplayer.MatchRequestBuilder;
-import v1.entities.replay.ReplayRequestBuilder;
-import v1.entities.scores.ScoresRequestBuilder;
-import v1.entities.user.UserRequestBuilder;
+import v1.entities.beatmap.BeatmapRequestBuilderV1;
+import v1.entities.bestperformance.BestPerformanceRequestBuilderV1;
+import v1.entities.multiplayer.MatchRequestBuilderV1;
+import v1.entities.multiplayer.MatchV1;
+import v1.entities.replay.ReplayRequestBuilderV1;
+import v1.entities.scores.ScoresRequestBuilderV1;
+import v1.entities.user.UserRequestBuilderV1;
 
 public class Test {
     public static void main(String[] args) {
@@ -17,30 +17,26 @@ public class Test {
                         .build()
         );
 
-        retrieveReplay(osu);
+        retrieveBeatmap(osu);
     }
 
     private static void retrieveBeatmap(Osu osu) {
-        BeatmapRequestBuilder beatmapRequestBuilder = new BeatmapRequestBuilder()
-                .setBeatmapId(298880L)
-                .addMods(Mod.DOUBLETIME, Mod.HARDROCK);
+        BeatmapRequestBuilderV1 beatmapV1RequestBuilder = new BeatmapRequestBuilderV1()
+                .setBeatmapId(2747701L);
 
-        osu.getV1().retrieveBeatmap(beatmapRequestBuilder)
-                .runAsync(System.out::println);
-
-        beatmapRequestBuilder = new BeatmapRequestBuilder()
-                .setBeatmapId(298880L);
-
-        osu.getV1().retrieveBeatmap(beatmapRequestBuilder)
-                .runAsync(System.out::println);
+        osu.getV1().retrieveBeatmap(beatmapV1RequestBuilder)
+                .runAsync(beatmapV1 -> {
+                    System.out.println(beatmapV1.getBeatmapCoverImageUrl());
+                    System.out.println(beatmapV1.getBeatmapCoverThumbnailUrl() );
+                });
     }
 
     private static void retrieveUser(Osu osu) {
-        UserRequestBuilder userRequestBuilder = new UserRequestBuilder()
+        UserRequestBuilderV1 userV1RequestBuilder = new UserRequestBuilderV1()
                 .setUsername("DirkieDurky")
                 .setEventDays(31);
 
-        osu.getV1().retrieveUser(userRequestBuilder)
+        osu.getV1().retrieveUser(userV1RequestBuilder)
                 .runAsync(user -> {
                     user.getEvents().forEach(System.out::println);
                     System.out.println(user.getUserProfileImageUrl());
@@ -50,45 +46,46 @@ public class Test {
     }
 
     private static void retrieveScores(Osu osu) {
-        ScoresRequestBuilder scoresRequestBuilder = new ScoresRequestBuilder()
+        ScoresRequestBuilderV1 scoresV1RequestBuilder = new ScoresRequestBuilderV1()
                 .setBeatmapId(298880L);
 
-        osu.getV1().retrieveScores(scoresRequestBuilder)
+        osu.getV1().retrieveScores(scoresV1RequestBuilder)
                 .forEachAsync(System.out::println);
     }
 
     private static void retrieveBestPerformance(Osu osu) {
-        BestPerformanceRequestBuilder bestPerformanceRequestBuilder = new BestPerformanceRequestBuilder()
+        BestPerformanceRequestBuilderV1 bestPerformanceV1RequestBuilder = new BestPerformanceRequestBuilderV1()
                 .setUsername("Tais993")
                 .setLimit(2);
 
-        osu.getV1().retrieveBestPerformance(bestPerformanceRequestBuilder)
+        osu.getV1().retrieveBestPerformance(bestPerformanceV1RequestBuilder)
                 .forEachAsync(System.out::println);
     }
 
     private static void retrieveMatch(Osu osu) {
-        MatchRequestBuilder matchRequestBuilder = new MatchRequestBuilder()
+        MatchRequestBuilderV1 matchV1RequestBuilder = new MatchRequestBuilderV1()
                 .setMatchId(1251251251L);
 
-        osu.getV1().retrieveMatchInfo(matchRequestBuilder)
-                .runAsync(System.out::println);
+        osu.getV1().retrieveMatchInfo(matchV1RequestBuilder)
+                .mapToList(MatchV1::toGames)
+                .forEachAsync(System.out::println);
     }
 
     private static void retrieveReplay(Osu osu) {
-        ReplayRequestBuilder replayRequestBuilder = new ReplayRequestBuilder()
+        ReplayRequestBuilderV1 replayV1RequestBuilder = new ReplayRequestBuilderV1()
                 .setBeatmapId(1180753L)
                 .setUsername("gatama344");
 
-        osu.getV1().retrieveReplay(replayRequestBuilder)
+        osu.getV1().retrieveReplay(replayV1RequestBuilder)
                 .runAsync(replay -> System.out.println(replay.getId()));
     }
 
     public static void test(Osu osu) {
-         ScoresRequestBuilder scoresRequestBuilder = new ScoresRequestBuilder()
+         ScoresRequestBuilderV1 scoresV1RequestBuilder = new ScoresRequestBuilderV1()
                 .setBeatmapId(1762728L)
                 .setUsername("DirkieDurky");
 
-        osu.getV1().retrieveScores(scoresRequestBuilder)
+        osu.getV1().retrieveScores(scoresV1RequestBuilder)
                 .forEachAsync(System.out::println);
     }
 }

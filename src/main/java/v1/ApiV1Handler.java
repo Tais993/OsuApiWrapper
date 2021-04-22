@@ -5,29 +5,31 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import futures.FutureImpl;
-import futures.SetFutureImpl;
+import futures.FutureListImpl;
 import osu.OsuSettings;
-import v1.entities.beatmap.Beatmap;
-import v1.entities.beatmap.BeatmapRequestBuilder;
-import v1.entities.bestperformance.BestPerformance;
-import v1.entities.bestperformance.BestPerformanceRequestBuilder;
-import v1.entities.multiplayer.Match;
-import v1.entities.multiplayer.MatchRequestBuilder;
-import v1.entities.replay.Replay;
-import v1.entities.replay.ReplayRequestBuilder;
-import v1.entities.scores.Score;
-import v1.entities.scores.ScoresRequestBuilder;
-import v1.entities.user.User;
-import v1.entities.user.UserRequestBuilder;
+import v1.entities.beatmap.BeatmapRequestBuilderV1;
+import v1.entities.beatmap.BeatmapV1;
+import v1.entities.bestperformance.BestPerformanceRequestBuilderV1;
+import v1.entities.bestperformance.BestPerformanceV1;
+import v1.entities.multiplayer.MatchRequestBuilderV1;
+import v1.entities.multiplayer.MatchV1;
+import v1.entities.replay.ReplayRequestBuilderV1;
+import v1.entities.replay.ReplayV1;
+import v1.entities.scores.ScoreV1;
+import v1.entities.scores.ScoresRequestBuilderV1;
+import v1.entities.user.UserRequestBuilderV1;
+import v1.entities.user.UserV1;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
 
 public class ApiV1Handler {
     private final String key;
@@ -47,100 +49,127 @@ public class ApiV1Handler {
         }
     }
 
-    public FutureImpl<Beatmap> retrieveBeatmap(BeatmapRequestBuilder beatmapRequestBuilder) {
-        Callable<Beatmap> callable = () -> {
-            beatmapRequestBuilder.setKey(key);
-            System.out.println(beatmapRequestBuilder.getUrl());
-
-            return new Beatmap(getJsonArray(beatmapRequestBuilder.getUrl()).get(0).getAsJsonObject());
-        };
-
-        return new FutureImpl<>(callable, executorService);
+    public ExecutorService getExecutorService() {
+        return executorService;
     }
 
-    public SetFutureImpl<Beatmap, Set<Beatmap>> retrieveBeatmaps(BeatmapRequestBuilder beatmapRequestBuilder) {
-        Callable<Set<Beatmap>> callable = () -> {
-            Set<Beatmap> beatmaps = new HashSet<>();
+    public FutureImpl<BeatmapV1> retrieveBeatmap(BeatmapRequestBuilderV1 beatmapV1RequestBuilder) {
+        Callable<BeatmapV1> callable = () -> {
+            beatmapV1RequestBuilder.setKey(key);
+            System.out.println(beatmapV1RequestBuilder.getUrl());
 
-            beatmapRequestBuilder.setKey(key);
-            JsonArray json = getJsonArray(beatmapRequestBuilder.getUrl());
-
-            json.forEach(jsonElement -> beatmaps.add(new Beatmap(jsonElement.getAsJsonObject())));
-
-            return beatmaps;
+            return new BeatmapV1(getJsonArray(beatmapV1RequestBuilder.getUrl()).get(0).getAsJsonObject());
         };
 
-        return new SetFutureImpl<>(callable, executorService);
+        return new FutureImpl<>(callable, this);
     }
 
-    public FutureImpl<User> retrieveUser(UserRequestBuilder userRequestBuilder) {
-        Callable<User> callable = ()  -> {
+    public FutureListImpl<BeatmapV1, List<BeatmapV1>> retrieveBeatmaps(BeatmapRequestBuilderV1 beatmapV1RequestBuilder) {
+        Callable<List<BeatmapV1>> callable = () -> {
+            List<BeatmapV1> beatmapV1s = new ArrayList<>();
 
-            userRequestBuilder.setKey(key);
-            System.out.println(userRequestBuilder.getUrl());
+            beatmapV1RequestBuilder.setKey(key);
+            JsonArray json = getJsonArray(beatmapV1RequestBuilder.getUrl());
 
-            return new User(getJsonArray(userRequestBuilder.getUrl()).get(0).getAsJsonObject());
+            json.forEach(jsonElement -> beatmapV1s.add(new BeatmapV1(jsonElement.getAsJsonObject())));
+
+            return beatmapV1s;
         };
 
-        return new FutureImpl<>(callable, executorService);
+        return new FutureListImpl<>(callable, this);
     }
 
-    public SetFutureImpl<Score, Set<Score>> retrieveScores(ScoresRequestBuilder scoresRequestBuilder) {
-        Callable<Set<Score>> callable = () -> {
-            Set<Score> scores = new HashSet<>();
 
-            scoresRequestBuilder.setKey(key);
+    public FutureImpl<UserV1> retrieveUser(UserRequestBuilderV1 userV1RequestBuilder) {
+        Callable<UserV1> callable = ()  -> {
 
-            JsonArray json = getJsonArray(scoresRequestBuilder.getUrl());
+            userV1RequestBuilder.setKey(key);
+            System.out.println(userV1RequestBuilder.getUrl());
 
-            json.forEach(jsonElement -> scores.add(new Score(jsonElement.getAsJsonObject())));
-
-            return scores;
+            return new UserV1(getJsonArray(userV1RequestBuilder.getUrl()).get(0).getAsJsonObject());
         };
 
-        return new SetFutureImpl<>(callable, executorService);
+        return new FutureImpl<>(callable, this);
     }
 
-    public SetFutureImpl<BestPerformance, Set<BestPerformance>> retrieveBestPerformance(BestPerformanceRequestBuilder bestPerformanceRequestBuilder) {
-        Callable<Set<BestPerformance>> callable = () -> {
-            Set<BestPerformance> bestPerformances = new HashSet<>();
+    public FutureListImpl<UserV1, List<UserV1>> retrieveUsers(List<UserRequestBuilderV1> userRequestBuildersV1) {
+        Callable<List<UserV1>> callable = ()  -> {
 
-            bestPerformanceRequestBuilder.setKey(key);
+            userRequestBuildersV1.forEach(userRequestBuilderV1 -> userRequestBuilderV1.setKey(key));
 
-            JsonArray json = getJsonArray(bestPerformanceRequestBuilder.getUrl());
+            List<UserV1> users = new ArrayList<>();
+
+            for (UserRequestBuilderV1 userRequestBuilderV1 : userRequestBuildersV1) {
+                users.add(new UserV1(getJsonArray(userRequestBuilderV1.getUrl()).get(0).getAsJsonObject()));
+            }
+
+            return users;
+        };
+
+        return new FutureListImpl<>(callable, this);
+    }
+
+
+    public FutureListImpl<ScoreV1, List<ScoreV1>> retrieveScores(ScoresRequestBuilderV1 scoresV1RequestBuilder) {
+        Callable<List<ScoreV1>> callable = () -> {
+            List<ScoreV1> scoreV1s = new ArrayList<>();
+
+            scoresV1RequestBuilder.setKey(key);
+
+            JsonArray json = getJsonArray(scoresV1RequestBuilder.getUrl());
+
+            json.forEach(jsonElement -> scoreV1s.add(new ScoreV1(jsonElement.getAsJsonObject())));
+
+            return scoreV1s;
+        };
+
+        return new FutureListImpl<>(callable, this);
+    }
+
+
+    public FutureListImpl<BestPerformanceV1, List<BestPerformanceV1>> retrieveBestPerformance(BestPerformanceRequestBuilderV1 bestPerformanceV1RequestBuilder) {
+        Callable<List<BestPerformanceV1>> callable = () -> {
+            List<BestPerformanceV1> bestPerformanceV1s = new ArrayList<>();
+
+            bestPerformanceV1RequestBuilder.setKey(key);
+
+            JsonArray json = getJsonArray(bestPerformanceV1RequestBuilder.getUrl());
 
             System.out.println(json);
 
-            json.forEach(jsonElement -> bestPerformances.add(new BestPerformance(jsonElement.getAsJsonObject())));
+            json.forEach(jsonElement -> bestPerformanceV1s.add(new BestPerformanceV1(jsonElement.getAsJsonObject())));
 
-            return bestPerformances;
+            return bestPerformanceV1s;
         };
 
-        return new SetFutureImpl<>(callable, executorService);
+        return new FutureListImpl<>(callable, this);
     }
 
-    public FutureImpl<Match> retrieveMatchInfo(MatchRequestBuilder matchRequestBuilder) {
-        Callable<Match> callable = ()  -> {
 
-            matchRequestBuilder.setKey(key);
-            System.out.println(matchRequestBuilder.getUrl());
+    public FutureImpl<MatchV1> retrieveMatchInfo(MatchRequestBuilderV1 matchV1RequestBuilder) {
+        Callable<MatchV1> callable = ()  -> {
 
-            return new Match(getJsonObject(matchRequestBuilder.getUrl()));
+            matchV1RequestBuilder.setKey(key);
+            System.out.println(matchV1RequestBuilder.getUrl());
+
+            return new MatchV1(getJsonObject(matchV1RequestBuilder.getUrl()));
         };
 
-        return new FutureImpl<>(callable, executorService);
+        return new FutureImpl<>(callable, this);
     }
 
-    public FutureImpl<Replay> retrieveReplay(ReplayRequestBuilder replayRequestBuilder) {
-        Callable<Replay> callable = ()  -> {
 
-            replayRequestBuilder.setKey(key);
+    public FutureImpl<ReplayV1> retrieveReplay(ReplayRequestBuilderV1 replayV1RequestBuilder) {
+        Callable<ReplayV1> callable = ()  -> {
 
-            return new Replay(getJsonObject(replayRequestBuilder.getUrl()));
+            replayV1RequestBuilder.setKey(key);
+
+            return new ReplayV1(getJsonObject(replayV1RequestBuilder.getUrl()));
         };
 
-        return new FutureImpl<>(callable, executorService);
+        return new FutureImpl<>(callable, this);
     }
+
 
     protected static JsonObject getJsonObject(String urlString) throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
