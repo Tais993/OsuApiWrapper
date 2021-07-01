@@ -1,17 +1,22 @@
 plugins {
     id 'java'
+    id 'com.github.johnrengelman.shadow' version '6.0.0'
 }
 
-group 'org.example'
+group 'nl.tijsbeek'
 version '1.0-SNAPSHOT'
+
+targetCompatibility = JavaVersion.VERSION_16
+sourceCompatibility = "16"
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
+    implementation 'com.google.oauth-client:google-oauth-client:1.31.2'
     implementation 'com.github.jponge:lzma-java:1.2'
-    implementation group: 'org.tukaani', name: 'xz', version: '1.8'
     implementation 'com.google.code.gson:gson:2.8.6'
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    implementation 'org.jetbrains:annotations:20.1.0'
+    compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.31'
 }

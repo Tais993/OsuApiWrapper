@@ -4,8 +4,8 @@ import v1.ApiV1Handler;
 import v2.ApiV2Handler;
 
 public class Osu {
-    private String keyV1;
-    private String keyV2;
+    private final String keyV1;
+    private final String keyV2;
 
     private final boolean isUsingV1;
     private final boolean isUsingV2;

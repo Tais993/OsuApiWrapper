@@ -1,5 +1,7 @@
 package v1.entities.beatmap;
 
+import org.jetbrains.annotations.Nullable;
+
 public enum Genre {
     ANY(0, "any"),
     UNSPECIFIED(1, "unspecified"),
@@ -19,7 +21,7 @@ public enum Genre {
     private final int id;
     private final String title;
 
-    Genre(int id, String title) {
+    Genre(final int id, final String title) {
         this.id = id;
         this.title = title;
     }
@@ -31,10 +33,10 @@ public enum Genre {
         return title;
     }
 
-    public static Genre getById(int id) {
-        for (Genre genre : Genre.values()) {
-            if (genre.getId() == id) {
-                return genre;
+    public static @Nullable Genre getById(final int id) {
+        for (final Genre genreV1 : Genre.values()) {
+            if (genreV1.id == id) {
+                return genreV1;
             }
         }
         return null;
@@ -42,6 +44,6 @@ public enum Genre {
 
     @Override
     public String toString() {
-        return id + "";
+        return String.valueOf(id);
     }
 }

@@ -34,9 +34,9 @@ public enum Language {
     }
 
     public static Language getById(int id) {
-        for (Language language : Language.values()) {
-            if (language.getId() == id) {
-                return language;
+        for (Language languageV1 : Language.values()) {
+            if (languageV1.getId() == id) {
+                return languageV1;
             }
         }
         return null;

@@ -22,9 +22,9 @@ public enum Mode {
     }
 
     public static Mode getById(int id) {
-        for (Mode mode : Mode.values()) {
-            if (mode.getId() == id) {
-                return mode;
+        for (Mode modeV1 : Mode.values()) {
+            if (modeV1.getId() == id) {
+                return modeV1;
             }
         }
         return null;

@@ -2,399 +2,181 @@ package v1.entities.beatmap;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import v1.entities.OsuEntity;
+import futures.OsuFuture;
+import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import v1.entities.global.Length;
 import v1.entities.global.Mode;
+import v1.entities.user.UserV1;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 
-public class Beatmap implements OsuEntity {
-    private final long beatmapSetId;
-    private final long beatmapId;
+public record Beatmap(
+        long beatmapSetId,
+        long beatmapId,
 
-    private final Approved approved;
+        Approved approved,
 
-    private final Length length;
-    private final int hitLength;
+        Length length,
+        Length hitLength,
 
-    private final String version;
-    private final String fileMd5;
+        String version,
+        String fileMd5,
 
-    private final double diffSize;
-    private final double diffOverall;
-    private final double diffApproach;
-    private final double diffDrain;
+        IDifficulty difficulty,
 
-    private final Mode mode;
+        Mode mode,
 
-    private final int countNormal;
-    private final int countSlider;
-    private final int countSpinner;
+        int countNormal,
+        int countSlider,
+        int countSpinner,
 
-    private final LocalDateTime submitDate;
-    private final LocalDateTime approvedDate;
-    private final LocalDateTime lastUpdateDate;
+        LocalDateTime submitDate,
+        LocalDateTime approvedDate,
+        LocalDateTime lastUpdateDate,
 
-    private final String artist;
+        String artist,
 
-    private final String title;
+        String title,
 
-    private final String creatorName;
-    private final long creatorId;
+        String creatorName,
+        long creatorId,
 
-    private final double bpm;
+        double bpm,
 
-    private final String source;
-    private final ArrayList<String> tags;
-    private final Genre genre;
-    private final Language language;
+        String source,
+        List<String> tags,
+        Genre genre,
+        Language language,
 
-    private final int favouriteCount;
-    private final double rating;
+        int favouriteCount,
+        double rating,
 
-    private final boolean storyboard;
-    private final boolean video;
-    private final boolean downloadUnavailable;
-    private final boolean audioUnavailable;
+        boolean hasStoryboard,
+        boolean hasVideo,
+        boolean hasDownloadAvailable,
+        boolean hasAudioAvailable,
 
-    private final int playCount;
-    private final int passCount;
+        int playCount,
+        int passCount,
 
-    private final ArrayList<String> packs;
+        List<String> packs,
 
-    private final int maxCombo;
+        int maxCombo) implements IBeatmap {
+    private static final Logger logger = LoggerFactory.getLogger(Beatmap.class);
 
-    private final double diffAim;
-    private final double diffSpeed;
-    private final double difficultyRating;
+    public static Beatmap fromJson(final JsonObject json) {
+        final long beatmapSetId = json.get("beatmapset_id").getAsLong();
+        final long beatmapId = json.get("beatmap_id").getAsLong();
 
+        final Approved approved = Approved.fromId(json.get("approved").getAsInt());
 
-    public Beatmap(JsonObject json) {
-        this.beatmapSetId = json.get("beatmapset_id").getAsLong();
-        this.beatmapId = json.get("beatmap_id").getAsLong();
+        final Length lengthV1 = new Length(json.get("total_length").getAsInt());
+        final Length hitLength = new Length(json.get("hit_length").getAsInt());
 
-        this.approved = Approved.fromId(json.get("approved").getAsInt());
+        final String version = json.get("version").getAsString();
 
-        this.length = new Length(json.get("total_length").getAsInt());
-        this.hitLength = json.get("hit_length").getAsInt();
+        final String fileMd5 = json.get("file_md5").getAsString();
 
-        this.version = json.get("version").getAsString();
+        final IDifficulty difficulty = DifficultyImpl.ofJson(json);
 
-        this.fileMd5 = json.get("file_md5").getAsString();
+        final Mode modeV1 = Mode.getById(json.get("mode").getAsInt());
 
-        this.diffSize = json.get("diff_size").getAsDouble();
-        this.diffOverall = json.get("diff_overall").getAsDouble();
-        this.diffApproach = json.get("diff_approach").getAsDouble();
-        this.diffDrain = json.get("diff_drain").getAsDouble();
+        final int countNormal = json.get("count_normal").getAsInt();
+        final int countSlider = json.get("count_slider").getAsInt();
+        final int countSpinner = json.get("count_spinner").getAsInt();
 
-        this.mode = Mode.getById(json.get("mode").getAsInt());
+        final LocalDateTime submitDate = getDateFromString(json.get("submit_date").getAsString());
+        final JsonElement approvedDateJson = json.get("approved_date");
 
-        this.countNormal = json.get("count_normal").getAsInt();
-        this.countSlider = json.get("count_slider").getAsInt();
-        this.countSpinner = json.get("count_spinner").getAsInt();
+        final LocalDateTime approvedDate = approvedDateJson.isJsonNull() ? null : getDateFromString(approvedDateJson.getAsString());
 
-        this.submitDate = getDateFromString(json.get("submit_date").getAsString());
-        JsonElement approvedDate = json.get("approved_date");
+        final LocalDateTime lastUpdateDate = getDateFromString(json.get("last_update").getAsString());
 
-        this.approvedDate = approvedDate.isJsonNull() ? null : getDateFromString(approvedDate.getAsString());
+        final String artist = json.get("artist").getAsString();
+        final String title = json.get("title").getAsString();
 
-        this.lastUpdateDate = getDateFromString(json.get("last_update").getAsString());
+        final String creatorName = json.get("creator").getAsString();
+        final long creatorId = json.get("creator_id").getAsLong();
 
-        this.artist = json.get("artist").getAsString();
-        this.title = json.get("title").getAsString();
+        final double bpm = json.get("bpm").getAsDouble();
 
-        this.creatorName = json.get("creator").getAsString();
-        this.creatorId = json.get("creator_id").getAsLong();
+        final String source = json.get("source").getAsString();
+        final List<String> tags = new ArrayList<>(Arrays.asList(json.get("tags").getAsString().split(" ")));
+        final Genre genre = Genre.getById(json.get("genre_id").getAsInt());
+        final Language language = Language.getById(json.get("language_id").getAsInt());
 
-        this.bpm = json.get("bpm").getAsDouble();
+        final int favouriteCount = json.get("favourite_count").getAsInt();
+        final double rating = json.get("rating").getAsDouble();
 
-        this.source = json.get("source").getAsString();
-        this.tags = new ArrayList<>(Arrays.asList(json.get("tags").getAsString().split(" ")));
-        this.genre = Genre.getById(json.get("genre_id").getAsInt());
-        this.language = Language.getById(json.get("language_id").getAsInt());
+        final boolean hasStoryboard = json.get("storyboard").getAsBoolean();
+        final boolean hasVideo = json.get("video").getAsBoolean();
+        final boolean hasDownloadAvailable = !json.get("download_unavailable").getAsBoolean();
+        final boolean hasAudioAvailable = !json.get("audio_unavailable").getAsBoolean();
 
-        this.favouriteCount = json.get("favourite_count").getAsInt();
-        this.rating = json.get("rating").getAsDouble();
+        final int playCount = json.get("playcount").getAsInt();
+        final int passCount = json.get("passcount").getAsInt();
 
-        this.storyboard = json.get("storyboard").getAsBoolean();
-        this.video = json.get("video").getAsBoolean();
-        this.downloadUnavailable = json.get("download_unavailable").getAsBoolean();
-        this.audioUnavailable = json.get("audio_unavailable").getAsBoolean();
-
-        this.playCount = json.get("playcount").getAsInt();
-        this.passCount = json.get("passcount").getAsInt();
+        final List<String> packs;
 
         if (json.get("packs").isJsonNull()) {
-            this.packs = new ArrayList<>();
+            packs = new ArrayList<>();
         } else {
-            this.packs = new ArrayList<>(Arrays.asList(json.get("packs").getAsString().split(",")));
+            packs = new ArrayList<>(Arrays.asList(json.get("packs").getAsString().split(",")));
         }
 
-        this.maxCombo = json.get("max_combo").getAsInt();
+        final int maxCombo = json.get("max_combo").getAsInt();
 
-        this.diffAim = json.get("diff_aim").getAsDouble();
-        this.diffSpeed = json.get("diff_speed").getAsDouble();
-
-        this.difficultyRating = json.get("difficultyrating").getAsDouble();
+        return new Beatmap(beatmapSetId, beatmapId, approved, lengthV1, hitLength, version, fileMd5, difficulty, modeV1, countNormal, countSlider, countSpinner, submitDate, approvedDate, lastUpdateDate, artist, title, creatorName, creatorId, bpm, source, tags, genre, language, favouriteCount, rating, hasStoryboard, hasVideo, hasDownloadAvailable, hasAudioAvailable, playCount, passCount, packs, maxCombo);
     }
 
-    private LocalDateTime getDateFromString(String timeAsString) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    @NotNull
+    private static LocalDateTime getDateFromString(final CharSequence timeAsString) {
+        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         return LocalDateTime.parse(timeAsString, formatter);
     }
 
-    public long getBeatmapSetId() {
-        return beatmapSetId;
+    @NotNull
+    public List<String> tags() {
+        return Collections.unmodifiableList(tags);
     }
 
-    public long getBeatmapId() {
-        return beatmapId;
+    // TODO
+    @Override
+    public @NotNull OsuFuture<UserV1> retrieveCreator() {
+        return null;
     }
 
-    public Approved getApproved() {
-        return approved;
-    }
-
-    public Length getLength() {
-        return length;
-    }
-
-    public int getHitLength() {
-        return hitLength;
-    }
-
-    public String getVersion() {
-        return version;
-    }
-
-    public String getFileMd5() {
-        return fileMd5;
-    }
-
-    public double getDiffSize() {
-        return diffSize;
-    }
-
-    public double getDiffOverall() {
-        return diffOverall;
-    }
-
-    public double getDiffApproach() {
-        return diffApproach;
-    }
-
-    public double getDiffDrain() {
-        return diffDrain;
-    }
-
-    public Mode getMode() {
-        return mode;
-    }
-
-    public int getCountNormal() {
-        return countNormal;
-    }
-
-    public int getCountSlider() {
-        return countSlider;
-    }
-
-    public int getCountSpinner() {
-        return countSpinner;
-    }
-
-    public LocalDateTime getSubmitDate() {
-        return submitDate;
-    }
-
-    public LocalDateTime getApprovedDate() {
-        return approvedDate;
-    }
-
-    public LocalDateTime getLastUpdateDate() {
-        return lastUpdateDate;
-    }
-
-    public String getArtist() {
-        return artist;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getCreatorName() {
-        return creatorName;
-    }
-
-    public long getCreatorId() {
-        return creatorId;
-    }
-
-    public double getBpm() {
-        return bpm;
-    }
-
-    public String getSource() {
-        return source;
-    }
-
-    public ArrayList<String> getTags() {
-        return tags;
-    }
-
-    public Genre getGenre() {
-        return genre;
-    }
-
-    public Language getLanguage() {
-        return language;
-    }
-
-    public int getFavouriteCount() {
-        return favouriteCount;
-    }
-
-    public double getRating() {
-        return rating;
-    }
-
-    public boolean isStoryboard() {
-        return storyboard;
-    }
-
-    public boolean isVideo() {
-        return video;
-    }
-
-    public boolean isDownloadUnavailable() {
-        return downloadUnavailable;
-    }
-
-    public boolean isAudioUnavailable() {
-        return audioUnavailable;
-    }
-
-    public int getPlayCount() {
-        return playCount;
-    }
-
-    public int getPassCount() {
-        return passCount;
-    }
-
-    public ArrayList<String> getPacks() {
-        return packs;
-    }
-
-    public int getMaxCombo() {
-        return maxCombo;
-    }
-
-    public double getDiffAim() {
-        return diffAim;
-    }
-
-    public double getDiffSpeed() {
-        return diffSpeed;
-    }
-
-    public double getDifficultyRating() {
-        return difficultyRating;
-    }
-
+    @NotNull
     public String getBeatmapCoverImageUrl() {
-        return "https://assets.ppy.sh/beatmaps/" + beatmapId + "/covers/cover.jpg";
+        return "https://assets.ppy.sh/beatmaps/" + beatmapSetId + "/covers/cover.jpg";
     }
 
-    public InputStream retrieveBeatmapCoverImage() {
-        try {
-            URL url = new URL( "https://assets.ppy.sh/beatmaps/" + beatmapId + "/covers/cover.jpg");
-            return url.openStream();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        throw new NullPointerException();
+    @NotNull
+    public InputStream retrieveBeatmapCoverImage() throws IOException {
+        final URL url = new URL( "https://assets.ppy.sh/beatmaps/" + beatmapSetId + "/covers/cover.jpg");
+        return url.openStream();
     }
 
+    @NotNull
     public String getBeatmapCoverThumbnailUrl() {
-        return "https://b.ppy.sh/thumb/" + beatmapId + "l.jpg";
+        return "https://b.ppy.sh/thumb/" + beatmapSetId + "l.jpg";
     }
 
-    public InputStream retrieveBeatmapCoverThumbnail() {
-        try {
-            URL url = new URL( "https://b.ppy.sh/thumb/" + beatmapId + "l.jpg");
-            return url.openStream();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        throw new NullPointerException();
+    @NotNull
+    public InputStream retrieveBeatmapCoverThumbnail() throws IOException {
+        final URL url = new URL( "https://b.ppy.sh/thumb/" + beatmapSetId + "l.jpg");
+        return url.openStream();
     }
 
+    @NotNull
     public String getBeatmapLink() {
-        return "https://osu.ppy.sh/beatmapsets/" + beatmapSetId + "#" + mode.getTitle().toLowerCase() + "/" + beatmapId;
-    }
-
-    @Override
-    public Long getId() {
-        return beatmapId;
-    }
-
-    @Override
-    public String getIdString() {
-        return beatmapId + "";
-    }
-
-    @Override
-    public String toString() {
-        return "Beatmap{" +
-                "\nbeatmapLink=" + getBeatmapLink() +
-                "\nbeatmapSetId=" + beatmapSetId +
-                ",\n beatmapId=" + beatmapId +
-                ",\n approved=" + approved +
-                ",\n length=" + length +
-                ",\n hitLength=" + hitLength +
-                ",\n version='" + version + '\'' +
-                ",\n fileMd5='" + fileMd5 + '\'' +
-                ",\n diffSize=" + diffSize +
-                ",\n diffOverall=" + diffOverall +
-                ",\n diffApproach=" + diffApproach +
-                ",\n diffDrain=" + diffDrain +
-                ",\n mode=" + mode +
-                ",\n countNormal=" + countNormal +
-                ",\n countSlider=" + countSlider +
-                ",\n countSpinner=" + countSpinner +
-                ",\n submitDate=" + submitDate +
-                ",\n approvedDate=" + approvedDate +
-                ",\n lastUpdateDate=" + lastUpdateDate +
-                ",\n artist='" + artist + '\'' +
-                ",\n title='" + title + '\'' +
-                ",\n creatorName='" + creatorName + '\'' +
-                ",\n creatorId=" + creatorId +
-                ",\n bpm=" + bpm +
-                ",\n source='" + source + '\'' +
-                ",\n tags=" + tags +
-                ",\n genre=" + genre +
-                ",\n language=" + language +
-                ",\n favouriteCount=" + favouriteCount +
-                ",\n rating=" + rating +
-                ",\n storyboard=" + storyboard +
-                ",\n video=" + video +
-                ",\n downloadUnavailable=" + downloadUnavailable +
-                ",\n audioUnavailable=" + audioUnavailable +
-                ",\n playCount=" + playCount +
-                ",\n passCount=" + passCount +
-                ",\n packs=" + packs +
-                ",\n maxCombo=" + maxCombo +
-                ",\n diffAim=" + diffAim +
-                ",\n diffSpeed=" + diffSpeed +
-                ",\n difficultyRating=" + difficultyRating +
-                "\n}";
+        return "https://osu.ppy.sh/beatmapsets/" + beatmapSetId() + '#' + mode.getTitle().toLowerCase(Locale.ROOT) + '/' + beatmapId();
     }
 }
