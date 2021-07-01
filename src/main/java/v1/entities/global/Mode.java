@@ -1,6 +1,6 @@
 package v1.entities.global;
 
-public enum ModeV1 {
+public enum Mode {
     OSU(0, "osu!"),
     TAIKO(1, "Taiko"),
     CTB(2, "CtB"),
@@ -9,7 +9,7 @@ public enum ModeV1 {
     private final int id;
     private final String title;
 
-    ModeV1(int id, String title) {
+    Mode(int id, String title) {
         this.id = id;
         this.title = title;
     }
@@ -21,8 +21,8 @@ public enum ModeV1 {
         return title;
     }
 
-    public static ModeV1 getById(int id) {
-        for (ModeV1 modeV1 : ModeV1.values()) {
+    public static Mode getById(int id) {
+        for (Mode modeV1 : Mode.values()) {
             if (modeV1.getId() == id) {
                 return modeV1;
             }

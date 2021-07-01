@@ -1,15 +1,16 @@
 import osu.Osu;
 import osu.OsuSettingsBuilder;
-import v1.entities.beatmap.BeatmapRequestBuilderV1;
-import v1.entities.bestperformance.BestPerformanceRequestBuilderV1;
-import v1.entities.multiplayer.MatchRequestBuilderV1;
+import v1.entities.beatmap.BeatmapIRequestBuilder;
+import v1.entities.bestperformance.BestPerformanceIRequestBuilder;
+import v1.entities.multiplayer.MatchIRequestBuilder;
 import v1.entities.multiplayer.MatchV1;
-import v1.entities.replay.ReplayRequestBuilderV1;
-import v1.entities.scores.ScoresRequestBuilderV1;
-import v1.entities.user.UserRequestBuilderV1;
+import v1.entities.replay.ReplayIRequestBuilder;
+import v1.entities.scores.ScoresIRequestBuilder;
+import v1.entities.user.UserIRequestBuilder;
 
 public class Test {
     public static void main(String[] args) {
+        @SuppressWarnings("SpellCheckingInspection")
         Osu osu = new Osu(
                 new OsuSettingsBuilder()
                         .setKeyV1("40c7ffe907acbcdfa992dd129031ad8886662880")
@@ -21,7 +22,7 @@ public class Test {
     }
 
     private static void retrieveBeatmap(Osu osu) {
-        BeatmapRequestBuilderV1 beatmapV1RequestBuilder = new BeatmapRequestBuilderV1()
+        BeatmapIRequestBuilder beatmapV1RequestBuilder = new BeatmapIRequestBuilder()
                 .setBeatmapId(2747701L);
 
         osu.getV1().retrieveBeatmap(beatmapV1RequestBuilder)
@@ -32,7 +33,7 @@ public class Test {
     }
 
     private static void retrieveUser(Osu osu) {
-        UserRequestBuilderV1 userV1RequestBuilder = new UserRequestBuilderV1()
+        UserIRequestBuilder userV1RequestBuilder = new UserIRequestBuilder()
                 .setUsername("DirkieDurky")
                 .setEventDays(31);
 
@@ -46,7 +47,7 @@ public class Test {
     }
 
     private static void retrieveScores(Osu osu) {
-        ScoresRequestBuilderV1 scoresV1RequestBuilder = new ScoresRequestBuilderV1()
+        ScoresIRequestBuilder scoresV1RequestBuilder = new ScoresIRequestBuilder()
                 .setBeatmapId(298880L);
 
         osu.getV1().retrieveScores(scoresV1RequestBuilder)
@@ -54,7 +55,7 @@ public class Test {
     }
 
     private static void retrieveBestPerformance(Osu osu) {
-        BestPerformanceRequestBuilderV1 bestPerformanceV1RequestBuilder = new BestPerformanceRequestBuilderV1()
+        BestPerformanceIRequestBuilder bestPerformanceV1RequestBuilder = new BestPerformanceIRequestBuilder()
                 .setUsername("Tais993")
                 .setLimit(2);
 
@@ -63,7 +64,7 @@ public class Test {
     }
 
     private static void retrieveMatch(Osu osu) {
-        MatchRequestBuilderV1 matchV1RequestBuilder = new MatchRequestBuilderV1()
+        MatchIRequestBuilder matchV1RequestBuilder = new MatchIRequestBuilder()
                 .setMatchId(1251251251L);
 
         osu.getV1().retrieveMatchInfo(matchV1RequestBuilder)
@@ -72,7 +73,7 @@ public class Test {
     }
 
     private static void retrieveReplay(Osu osu) {
-        ReplayRequestBuilderV1 replayV1RequestBuilder = new ReplayRequestBuilderV1()
+        ReplayIRequestBuilder replayV1RequestBuilder = new ReplayIRequestBuilder()
                 .setBeatmapId(1180753L)
                 .setUsername("gatama344");
 
@@ -81,7 +82,7 @@ public class Test {
     }
 
     public static void test(Osu osu) {
-         ScoresRequestBuilderV1 scoresV1RequestBuilder = new ScoresRequestBuilderV1()
+         ScoresIRequestBuilder scoresV1RequestBuilder = new ScoresIRequestBuilder()
                 .setBeatmapId(1762728L)
                 .setUsername("DirkieDurky");
 

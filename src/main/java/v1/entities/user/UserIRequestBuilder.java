@@ -1,44 +1,44 @@
 package v1.entities.user;
 
 import v1.ApiV1Handler;
-import v1.entities.RequestBuilderV1;
-import v1.entities.global.ModeV1;
+import v1.entities.IRequestBuilder;
+import v1.entities.global.Mode;
 import v1.entities.global.TypeV1;
 
-public class UserRequestBuilderV1 extends RequestBuilderV1<UserRequestBuilderV1> {
+public class UserIRequestBuilder implements IRequestBuilder<UserIRequestBuilder> {
     private String key;
 
     private String user;
-    private ModeV1 modeV1;
+    private Mode modeV1;
 
     private TypeV1 typeV1;
 
     private int eventDays;
 
     @Override
-    public UserRequestBuilderV1 setKey(String key) {
+    public UserIRequestBuilder setKey(String key) {
         this.key = key;
         return this;
     }
 
-    public UserRequestBuilderV1 setUsername(String user) {
+    public UserIRequestBuilder setUsername(String user) {
         this.user = user;
         this.typeV1 = TypeV1.USERNAME;
         return this;
     }
 
-    public UserRequestBuilderV1 setUserId(long userId) {
+    public UserIRequestBuilder setUserId(long userId) {
         this.user = userId + "";
         this.typeV1 = TypeV1.USER_ID;
         return this;
     }
 
-    public UserRequestBuilderV1 setMode(ModeV1 modeV1) {
+    public UserIRequestBuilder setMode(Mode modeV1) {
         this.modeV1 = modeV1;
         return this;
     }
 
-    public UserRequestBuilderV1 setEventDays(int eventDays) {
+    public UserIRequestBuilder setEventDays(int eventDays) {
         if (eventDays >= 1 && eventDays <= 31) {
             this.eventDays = eventDays;
             return this;

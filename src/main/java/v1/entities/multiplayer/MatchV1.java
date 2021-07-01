@@ -50,7 +50,7 @@ public class MatchV1 implements OsuEntityV1 {
     }
 
     public GameV1 toLatestGame() {
-        return gameV1s.get(gameV1s.size());
+        return gameV1s.get(gameV1s.size() - 1);
     }
 
     @Override

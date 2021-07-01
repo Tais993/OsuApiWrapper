@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import v1.entities.OsuEntityV1;
 import v1.entities.global.DateTimeHandlerV1;
 import v1.entities.global.ModV1;
-import v1.entities.global.ModeV1;
+import v1.entities.global.Mode;
 import v1.entities.multiplayer.MatchScoreV1;
 
 import java.time.LocalDateTime;
@@ -19,7 +19,7 @@ public class GameV1 implements OsuEntityV1 {
 
     private final long beatmapId;
 
-    private final ModeV1 playModeV1;
+    private final Mode playModeV1;
     private final String matchType;
     private final ScoringTypeV1 scoringTypeV1;
     private final TeamTypeV1 teamTypeV1;
@@ -36,7 +36,7 @@ public class GameV1 implements OsuEntityV1 {
 
         this.beatmapId = json.get("beatmap_id").getAsLong();
 
-        this.playModeV1 = ModeV1.getById(json.get("play_mode").getAsInt());
+        this.playModeV1 = Mode.getById(json.get("play_mode").getAsInt());
 
         this.matchType = json.get("match_type").getAsString();
 
@@ -61,7 +61,7 @@ public class GameV1 implements OsuEntityV1 {
         return beatmapId;
     }
 
-    public ModeV1 getPlayMode() {
+    public Mode getPlayMode() {
         return playModeV1;
     }
 

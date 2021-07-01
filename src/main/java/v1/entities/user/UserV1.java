@@ -3,7 +3,7 @@ package v1.entities.user;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import v1.entities.OsuEntityV1;
-import v1.entities.global.LengthV1;
+import v1.entities.global.Length;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,7 +48,7 @@ public class UserV1 implements OsuEntityV1 {
     private final CountryV1 countryV1;
     private final int countryRank;
 
-    private final LengthV1 totalSecondsPlayed;
+    private final Length totalSecondsPlayed;
 
     private final Set<EventV1> eventV1s;
 
@@ -81,7 +81,7 @@ public class UserV1 implements OsuEntityV1 {
         this.countryV1 = CountryV1.getByAbbreviation(json.get("country").getAsString());
         this.countryRank = json.get("pp_country_rank").getAsInt();
 
-        this.totalSecondsPlayed = new LengthV1(json.get("total_seconds_played").getAsLong());
+        this.totalSecondsPlayed = new Length(json.get("total_seconds_played").getAsLong());
 
         Set<EventV1> eventV1s = new HashSet<>();
         JsonArray array = json.get("events").getAsJsonArray();
@@ -170,7 +170,7 @@ public class UserV1 implements OsuEntityV1 {
         return countryRank;
     }
 
-    public LengthV1 getTotalSecondsPlayed() {
+    public Length getTotalSecondsPlayed() {
         return totalSecondsPlayed;
     }
 
@@ -183,12 +183,12 @@ public class UserV1 implements OsuEntityV1 {
     }
 
     public String getUserProfileImageUrl() {
-        return "http://s.ppy.sh/a/" + userId;
+        return "https://s.ppy.sh/a/" + userId;
     }
 
     public InputStream retrieveUserProfileImage() {
         try {
-            URL url = new URL("http://s.ppy.sh/a/" + userId);
+            URL url = new URL("https://s.ppy.sh/a/" + userId);
             return url.openStream();
         } catch (IOException e) {
             e.printStackTrace();

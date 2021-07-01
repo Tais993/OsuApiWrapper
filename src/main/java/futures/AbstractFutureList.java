@@ -7,7 +7,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public abstract class AbstractFutureList<A, B extends List<A>> {
+public abstract class AbstractFutureList<A, B extends List<? extends A>> {
     private Predicate<? super A> filter = null;
     private Comparator<? super A> sorter = null;
     private long limit = 0L;
@@ -27,7 +27,8 @@ public abstract class AbstractFutureList<A, B extends List<A>> {
             localStream = localStream.limit(limit);
         }
 
-        return (B) localStream.collect(Collectors.toSet());
+        //noinspection unchecked
+        return (B) localStream.collect(Collectors.toList());
     }
 
     void setFilter(Predicate<? super A> filter) {

@@ -1,7 +1,5 @@
 package futures;
 
-import futures.AbstractOsuEntityFuture;
-import futures.FutureImpl;
 import v1.entities.OsuEntityV1;
 
 import java.util.function.Consumer;

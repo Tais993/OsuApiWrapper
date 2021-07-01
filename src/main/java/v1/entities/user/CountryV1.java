@@ -1,5 +1,6 @@
 package v1.entities.user;
 
+@SuppressWarnings("ALL")
 public enum CountryV1 {
     AFGHANISTAN("AF", "Afghanistan"),
     ALAND_ISLANDS("AX", "Åland Islands"),
@@ -252,8 +253,8 @@ public enum CountryV1 {
     ZIMBABWE("ZW", "Zimbabwe");
 
 
-    String abbreviation;
-    String countryName;
+    final String abbreviation;
+    final String countryName;
 
     CountryV1(String abbreviation, String countryName) {
         this.abbreviation = abbreviation;

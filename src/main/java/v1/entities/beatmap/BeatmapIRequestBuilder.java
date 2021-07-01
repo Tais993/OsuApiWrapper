@@ -1,9 +1,9 @@
 package v1.entities.beatmap;
 
 import v1.ApiV1Handler;
-import v1.entities.RequestBuilderV1;
+import v1.entities.IRequestBuilder;
 import v1.entities.global.ModV1;
-import v1.entities.global.ModeV1;
+import v1.entities.global.Mode;
 import v1.entities.global.TypeV1;
 
 import java.time.LocalDate;
@@ -11,94 +11,94 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
-public class BeatmapRequestBuilderV1 extends RequestBuilderV1<BeatmapRequestBuilderV1> {
-    private String key;
+public class BeatmapIRequestBuilder implements IRequestBuilder<BeatmapIRequestBuilder> {
+    private String key = null;
 
-    private LocalDate since;
+    private LocalDate since = null;
 
-    private Long beatmapSetId;
-    private Long beatmapId;
+    private long beatmapSetId = 0;
+    private long beatmapId = 0;
 
-    private String user;
+    private String user = null;
 
-    private TypeV1 typeV1;
+    private TypeV1 typeV1 = null;
 
-    private ModeV1 modeV1;
+    private Mode modeV1 = null;
 
-    private Boolean includesConvertedBeatmaps = false;
+    private boolean includesConvertedBeatmaps = false;
 
-    private String beatmapHash;
+    private String beatmapHash = null;
 
-    private int limit;
+    private int limit = 0;
 
     private final ArrayList<ModV1> modV1s = new ArrayList<>();
 
     @Override
-    public BeatmapRequestBuilderV1 setKey(String key) {
+    public BeatmapIRequestBuilder setKey(String key) {
         this.key = key;
         return this;
     }
 
-    public BeatmapRequestBuilderV1 since(LocalDate since) {
+    public BeatmapIRequestBuilder since(LocalDate since) {
         this.since = since;
         return this;
     }
 
-    public BeatmapRequestBuilderV1 setBeatmapSetId(Long beatmapSetId) {
+    public BeatmapIRequestBuilder setBeatmapSetId(long beatmapSetId) {
         this.beatmapSetId = beatmapSetId;
         return this;
     }
 
-    public BeatmapRequestBuilderV1 setBeatmapId(Long beatmapId) {
+    public BeatmapIRequestBuilder setBeatmapId(long beatmapId) {
         this.beatmapId = beatmapId;
         return this;
     }
 
-    public BeatmapRequestBuilderV1 setUsername(String user) {
+    public BeatmapIRequestBuilder setUsername(String user) {
         this.user = user;
         this.typeV1 = TypeV1.USERNAME;
         return this;
     }
 
-    public BeatmapRequestBuilderV1 setUserId(Long userId) {
+    public BeatmapIRequestBuilder setUserId(long userId) {
         this.user = userId + "";
         this.typeV1 = TypeV1.USER_ID;
         return this;
     }
 
-    public BeatmapRequestBuilderV1 setMode(ModeV1 modeV1) {
+    public BeatmapIRequestBuilder setMode(Mode modeV1) {
         this.modeV1 = modeV1;
         return this;
     }
 
-    public BeatmapRequestBuilderV1 includesConvertedBeatmaps(Boolean includesConvertedBeatmaps) {
+    public BeatmapIRequestBuilder includesConvertedBeatmaps(boolean includesConvertedBeatmaps) {
         this.includesConvertedBeatmaps = includesConvertedBeatmaps;
         return this;
     }
 
-    public BeatmapRequestBuilderV1 setBeatmapHash(String beatmapHash) {
+    public BeatmapIRequestBuilder setBeatmapHash(String beatmapHash) {
         this.beatmapHash = beatmapHash;
         return this;
     }
 
-    public BeatmapRequestBuilderV1 setLimit(int limit) {
+    public BeatmapIRequestBuilder setLimit(int limit) {
         this.limit = limit;
         return this;
     }
 
-    public BeatmapRequestBuilderV1 addMods(ModV1... modV1s) {
+    public BeatmapIRequestBuilder addMods(ModV1... modV1s) {
         Collections.addAll(this.modV1s, modV1s);
         System.out.println(Arrays.toString(modV1s));
         System.out.println(this.modV1s);
         return this;
     }
 
-    public BeatmapRequestBuilderV1 removeMod(ModV1 modV1) {
+    public BeatmapIRequestBuilder removeMod(ModV1 modV1) {
         modV1s.remove(modV1);
         return this;
     }
 
-    public BeatmapRequestBuilderV1 clearMods() {
+    public BeatmapIRequestBuilder clearMods() {
         modV1s.clear();
         return this;
     }
@@ -109,14 +109,14 @@ public class BeatmapRequestBuilderV1 extends RequestBuilderV1<BeatmapRequestBuil
         url.append("get_beatmaps?k=").append(key);
 
         if (since != null) {
-            url.append("&since=").append(since.toString());
+            url.append("&since=").append(since);
         }
 
-        if (beatmapSetId != null) {
+        if (beatmapSetId != 0) {
             url.append("&s=").append(beatmapSetId);
         }
 
-        if (beatmapId != null) {
+        if (beatmapId != 0) {
             url.append("&b=").append(beatmapId);
         }
 

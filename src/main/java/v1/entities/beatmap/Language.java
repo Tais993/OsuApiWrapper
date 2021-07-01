@@ -1,6 +1,6 @@
 package v1.entities.beatmap;
 
-public enum LanguageV1 {
+public enum Language {
     ANY(0, "any"),
     UNSPECIFIED(1, "unspecified"),
     ENGLISH(2, "english"),
@@ -20,7 +20,7 @@ public enum LanguageV1 {
     private final int id;
     private final String title;
 
-    LanguageV1(int id, String title) {
+    Language(int id, String title) {
         this.id = id;
         this.title = title;
     }
@@ -33,8 +33,8 @@ public enum LanguageV1 {
         return title;
     }
 
-    public static LanguageV1 getById(int id) {
-        for (LanguageV1 languageV1 : LanguageV1.values()) {
+    public static Language getById(int id) {
+        for (Language languageV1 : Language.values()) {
             if (languageV1.getId() == id) {
                 return languageV1;
             }

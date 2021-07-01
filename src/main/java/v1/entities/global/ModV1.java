@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
+@SuppressWarnings("ALL")
 public enum ModV1 {
     NONE(0, "none", ""),
     NOFAIL(1, "no fail", "NF", "fm"),

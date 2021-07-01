@@ -7,17 +7,18 @@ import com.google.gson.JsonObject;
 import futures.FutureImpl;
 import futures.FutureListImpl;
 import osu.OsuSettings;
-import v1.entities.beatmap.BeatmapRequestBuilderV1;
-import v1.entities.beatmap.BeatmapV1;
-import v1.entities.bestperformance.BestPerformanceRequestBuilderV1;
+import v1.entities.beatmap.Beatmap;
+import v1.entities.beatmap.BeatmapIRequestBuilder;
+import v1.entities.beatmap.IBeatmap;
+import v1.entities.bestperformance.BestPerformanceIRequestBuilder;
 import v1.entities.bestperformance.BestPerformanceV1;
-import v1.entities.multiplayer.MatchRequestBuilderV1;
+import v1.entities.multiplayer.MatchIRequestBuilder;
 import v1.entities.multiplayer.MatchV1;
-import v1.entities.replay.ReplayRequestBuilderV1;
+import v1.entities.replay.ReplayIRequestBuilder;
 import v1.entities.replay.ReplayV1;
 import v1.entities.scores.ScoreV1;
-import v1.entities.scores.ScoresRequestBuilderV1;
-import v1.entities.user.UserRequestBuilderV1;
+import v1.entities.scores.ScoresIRequestBuilder;
+import v1.entities.user.UserIRequestBuilder;
 import v1.entities.user.UserV1;
 
 import java.io.IOException;
@@ -31,45 +32,51 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 
-public class ApiV1Handler {
+public class ApiV1Handler implements IApiHandler{
     private final String key;
     public final static String startUrl = "https://osu.ppy.sh/api/";
     private final ArrayBlockingQueue<Runnable> blockingQueue;
     private final ExecutorService executorService;
 
-    public ApiV1Handler(OsuSettings osuS) {
-        this.key = osuS.getKeyV1();
+    public ApiV1Handler(final OsuSettings osuS) {
+        key = osuS.getKeyV1();
 
         if (osuS.useSeparateQueues()) {
-            this.blockingQueue = osuS.getV1Queue();
-            this.executorService = osuS.getV1Executor();
+            blockingQueue = osuS.getV1Queue();
+            executorService = osuS.getV1Executor();
         } else {
-            this.blockingQueue = osuS.getBlockingQueue();
-            this.executorService = osuS.getExecutorService();
+            blockingQueue = osuS.getBlockingQueue();
+            executorService = osuS.getExecutorService();
         }
+    }
+
+    public ArrayBlockingQueue<Runnable> getBlockingQueue() {
+        return blockingQueue;
     }
 
     public ExecutorService getExecutorService() {
         return executorService;
     }
 
-    public FutureImpl<BeatmapV1> retrieveBeatmap(BeatmapRequestBuilderV1 beatmapV1RequestBuilder) {
-        Callable<BeatmapV1> callable = () -> {
+    @Override
+    public FutureImpl<IBeatmap> retrieveBeatmap(final BeatmapIRequestBuilder beatmapV1RequestBuilder) {
+        final Callable<IBeatmap> callable = () -> {
             beatmapV1RequestBuilder.setKey(key);
             System.out.println(beatmapV1RequestBuilder.getUrl());
 
-            return new BeatmapV1(getJsonArray(beatmapV1RequestBuilder.getUrl()).get(0).getAsJsonObject());
+            return Beatmap.fromJson(getJsonArray(beatmapV1RequestBuilder.getUrl()).get(0).getAsJsonObject());
         };
 
-        return new FutureImpl<>(callable, this);
+        return new FutureImpl<IBeatmap>(callable, this);
     }
 
-    public FutureListImpl<BeatmapV1, List<BeatmapV1>> retrieveBeatmaps(BeatmapRequestBuilderV1 beatmapV1RequestBuilder) {
-        Callable<List<BeatmapV1>> callable = () -> {
-            List<BeatmapV1> beatmapV1s = new ArrayList<>();
+    @Override
+    public FutureListImpl<BeatmapV1, List<BeatmapV1>> retrieveBeatmaps(final BeatmapIRequestBuilder beatmapV1RequestBuilder) {
+        final Callable<List<BeatmapV1>> callable = () -> {
+            final List<BeatmapV1> beatmapV1s = new ArrayList<>();
 
             beatmapV1RequestBuilder.setKey(key);
-            JsonArray json = getJsonArray(beatmapV1RequestBuilder.getUrl());
+            final JsonArray json = getJsonArray(beatmapV1RequestBuilder.getUrl());
 
             json.forEach(jsonElement -> beatmapV1s.add(new BeatmapV1(jsonElement.getAsJsonObject())));
 
@@ -79,9 +86,9 @@ public class ApiV1Handler {
         return new FutureListImpl<>(callable, this);
     }
 
-
-    public FutureImpl<UserV1> retrieveUser(UserRequestBuilderV1 userV1RequestBuilder) {
-        Callable<UserV1> callable = ()  -> {
+    @Override
+    public FutureImpl<UserV1> retrieveUser(final UserIRequestBuilder userV1RequestBuilder) {
+        final Callable<UserV1> callable = ()  -> {
 
             userV1RequestBuilder.setKey(key);
             System.out.println(userV1RequestBuilder.getUrl());
@@ -92,14 +99,15 @@ public class ApiV1Handler {
         return new FutureImpl<>(callable, this);
     }
 
-    public FutureListImpl<UserV1, List<UserV1>> retrieveUsers(List<UserRequestBuilderV1> userRequestBuildersV1) {
-        Callable<List<UserV1>> callable = ()  -> {
+    @Override
+    public FutureListImpl<UserV1, List<UserV1>> retrieveUsers(final List<UserIRequestBuilder> userRequestBuildersV1) {
+        final Callable<List<UserV1>> callable = ()  -> {
 
             userRequestBuildersV1.forEach(userRequestBuilderV1 -> userRequestBuilderV1.setKey(key));
 
-            List<UserV1> users = new ArrayList<>();
+            final List<UserV1> users = new ArrayList<>();
 
-            for (UserRequestBuilderV1 userRequestBuilderV1 : userRequestBuildersV1) {
+            for (final UserIRequestBuilder userRequestBuilderV1 : userRequestBuildersV1) {
                 users.add(new UserV1(getJsonArray(userRequestBuilderV1.getUrl()).get(0).getAsJsonObject()));
             }
 
@@ -110,13 +118,14 @@ public class ApiV1Handler {
     }
 
 
-    public FutureListImpl<ScoreV1, List<ScoreV1>> retrieveScores(ScoresRequestBuilderV1 scoresV1RequestBuilder) {
-        Callable<List<ScoreV1>> callable = () -> {
-            List<ScoreV1> scoreV1s = new ArrayList<>();
+    @Override
+    public FutureListImpl<ScoreV1, List<ScoreV1>> retrieveScores(final ScoresIRequestBuilder scoresV1RequestBuilder) {
+        final Callable<List<ScoreV1>> callable = () -> {
+            final List<ScoreV1> scoreV1s = new ArrayList<>();
 
             scoresV1RequestBuilder.setKey(key);
 
-            JsonArray json = getJsonArray(scoresV1RequestBuilder.getUrl());
+            final JsonArray json = getJsonArray(scoresV1RequestBuilder.getUrl());
 
             json.forEach(jsonElement -> scoreV1s.add(new ScoreV1(jsonElement.getAsJsonObject())));
 
@@ -126,14 +135,14 @@ public class ApiV1Handler {
         return new FutureListImpl<>(callable, this);
     }
 
-
-    public FutureListImpl<BestPerformanceV1, List<BestPerformanceV1>> retrieveBestPerformance(BestPerformanceRequestBuilderV1 bestPerformanceV1RequestBuilder) {
-        Callable<List<BestPerformanceV1>> callable = () -> {
-            List<BestPerformanceV1> bestPerformanceV1s = new ArrayList<>();
+    @Override
+    public FutureListImpl<BestPerformanceV1, List<BestPerformanceV1>> retrieveBestPerformance(final BestPerformanceIRequestBuilder bestPerformanceV1RequestBuilder) {
+        final Callable<List<BestPerformanceV1>> callable = () -> {
+            final List<BestPerformanceV1> bestPerformanceV1s = new ArrayList<>();
 
             bestPerformanceV1RequestBuilder.setKey(key);
 
-            JsonArray json = getJsonArray(bestPerformanceV1RequestBuilder.getUrl());
+            final JsonArray json = getJsonArray(bestPerformanceV1RequestBuilder.getUrl());
 
             System.out.println(json);
 
@@ -145,9 +154,9 @@ public class ApiV1Handler {
         return new FutureListImpl<>(callable, this);
     }
 
-
-    public FutureImpl<MatchV1> retrieveMatchInfo(MatchRequestBuilderV1 matchV1RequestBuilder) {
-        Callable<MatchV1> callable = ()  -> {
+    @Override
+    public FutureImpl<MatchV1> retrieveMatchInfo(final MatchIRequestBuilder matchV1RequestBuilder) {
+        final Callable<MatchV1> callable = ()  -> {
 
             matchV1RequestBuilder.setKey(key);
             System.out.println(matchV1RequestBuilder.getUrl());
@@ -158,9 +167,9 @@ public class ApiV1Handler {
         return new FutureImpl<>(callable, this);
     }
 
-
-    public FutureImpl<ReplayV1> retrieveReplay(ReplayRequestBuilderV1 replayV1RequestBuilder) {
-        Callable<ReplayV1> callable = ()  -> {
+    @Override
+    public FutureImpl<ReplayV1> retrieveReplay(final ReplayIRequestBuilder replayV1RequestBuilder) {
+        final Callable<ReplayV1> callable = ()  -> {
 
             replayV1RequestBuilder.setKey(key);
 
@@ -171,36 +180,36 @@ public class ApiV1Handler {
     }
 
 
-    protected static JsonObject getJsonObject(String urlString) throws IOException, InterruptedException {
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
+    protected static JsonObject getJsonObject(final String urlString) throws IOException, InterruptedException {
+        final HttpClient client = HttpClient.newHttpClient();
+        final HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(urlString))
                 .GET()
                 .build();
 
-        String jsonString = client.send(request, HttpResponse.BodyHandlers.ofString()).body();
+        final String jsonString = client.send(request, HttpResponse.BodyHandlers.ofString()).body();
         return new Gson().fromJson(jsonString, JsonObject.class);
     }
 
-    protected static JsonArray getJsonArray(String urlString) throws IOException, InterruptedException {
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
+    protected static JsonArray getJsonArray(final String urlString) throws IOException, InterruptedException {
+        final HttpClient client = HttpClient.newHttpClient();
+        final HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(urlString))
                 .GET()
                 .build();
 
-        String jsonString = client.send(request, HttpResponse.BodyHandlers.ofString()).body();
+        final String jsonString = client.send(request, HttpResponse.BodyHandlers.ofString()).body();
         return new Gson().fromJson(jsonString, JsonArray.class);
     }
 
-    protected static JsonElement getJsonElement(String urlString) throws IOException, InterruptedException {
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
+    protected static JsonElement getJsonElement(final String urlString) throws IOException, InterruptedException {
+        final HttpClient client = HttpClient.newHttpClient();
+        final HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(urlString))
                 .GET()
                 .build();
 
-        String jsonString = client.send(request, HttpResponse.BodyHandlers.ofString()).body();
+        final String jsonString = client.send(request, HttpResponse.BodyHandlers.ofString()).body();
         return new Gson().fromJson(jsonString, JsonElement.class);
     }
 }

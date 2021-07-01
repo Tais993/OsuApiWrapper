@@ -1,20 +1,20 @@
 package v1.entities.multiplayer;
 
 import v1.ApiV1Handler;
-import v1.entities.RequestBuilderV1;
+import v1.entities.IRequestBuilder;
 
-public class MatchRequestBuilderV1 extends RequestBuilderV1<MatchRequestBuilderV1> {
+public class MatchIRequestBuilder implements IRequestBuilder<MatchIRequestBuilder> {
     private String key;
 
     private long matchId;
 
     @Override
-    public MatchRequestBuilderV1 setKey(String key) {
+    public MatchIRequestBuilder setKey(String key) {
         this.key = key;
         return this;
     }
 
-    public MatchRequestBuilderV1 setMatchId(long matchId) {
+    public MatchIRequestBuilder setMatchId(long matchId) {
         this.matchId = matchId;
         return this;
     }

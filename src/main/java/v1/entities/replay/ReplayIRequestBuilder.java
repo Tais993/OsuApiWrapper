@@ -1,15 +1,16 @@
-package v1.entities.scores;
+package v1.entities.replay;
 
 import v1.ApiV1Handler;
-import v1.entities.RequestBuilderV1;
+import v1.entities.IRequestBuilder;
 import v1.entities.global.ModV1;
-import v1.entities.global.ModeV1;
+import v1.entities.global.Mode;
 import v1.entities.global.TypeV1;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class ScoresRequestBuilderV1 extends RequestBuilderV1<ScoresRequestBuilderV1> {
+@SuppressWarnings("DuplicatedCode")
+public class ReplayIRequestBuilder implements IRequestBuilder<ReplayIRequestBuilder> {
     private String key;
 
     private long beatmapId;
@@ -17,47 +18,53 @@ public class ScoresRequestBuilderV1 extends RequestBuilderV1<ScoresRequestBuilde
     private String user;
     private TypeV1 typeV1;
 
-    private ModeV1 modeV1;
+    private Mode modeV1;
+
+    private long scoreId;
 
     private final ArrayList<ModV1> modV1s = new ArrayList<>();
 
-    private int limit;
-
     @Override
-    public ScoresRequestBuilderV1 setKey(String key) {
+    public ReplayIRequestBuilder setKey(String key) {
         this.key = key;
         return this;
     }
 
-    public ScoresRequestBuilderV1 setBeatmapId(long beatmapId) {
+    public ReplayIRequestBuilder setBeatmapId(long beatmapId) {
         this.beatmapId = beatmapId;
         return this;
     }
 
-    public ScoresRequestBuilderV1 setUsername(String userName) {
+    public ReplayIRequestBuilder setUsername(String userName) {
         this.user = userName;
         this.typeV1 = TypeV1.USERNAME;
         return this;
     }
 
-    public ScoresRequestBuilderV1 setUserId(long userId) {
+    public ReplayIRequestBuilder setUserId(long userId) {
         this.user = userId + "";
         this.typeV1 = TypeV1.USER_ID;
         return this;
     }
 
-    public ScoresRequestBuilderV1 setMode(ModeV1 modeV1) {
+
+    public ReplayIRequestBuilder setMode(Mode modeV1) {
         this.modeV1 = modeV1;
         return this;
     }
 
-    public ScoresRequestBuilderV1 addMods(ModV1... modV1s) {
+    public ReplayIRequestBuilder addMods(ModV1... modV1s) {
         this.modV1s.addAll(Arrays.asList(modV1s));
         return this;
     }
 
-    public ScoresRequestBuilderV1 setLimit(int limit) {
-        this.limit = limit;
+    public ReplayIRequestBuilder clearMods() {
+        this.modV1s.clear();
+        return this;
+    }
+
+    public ReplayIRequestBuilder setScoreId(long scoreId) {
+        this.scoreId = scoreId;
         return this;
     }
 
@@ -65,7 +72,7 @@ public class ScoresRequestBuilderV1 extends RequestBuilderV1<ScoresRequestBuilde
     public String getUrl() {
         StringBuilder url = new StringBuilder(ApiV1Handler.startUrl);
 
-        url.append("get_scores?k=").append(key);
+        url.append("get_replay?k=").append(key);
 
         if (beatmapId != 0) {
             url.append("&b=").append(beatmapId);
@@ -83,13 +90,15 @@ public class ScoresRequestBuilderV1 extends RequestBuilderV1<ScoresRequestBuilde
             url.append("&m=").append(modeV1);
         }
 
+        if (scoreId != 0) {
+            url.append("&s=").append(scoreId);
+        }
+
         if (!modV1s.isEmpty()) {
             url.append("&mods=").append(ModV1.getBitwiseFromMods(modV1s));
         }
 
-        if (limit != 0) {
-            url.append("&limit=").append(limit);
-        }
+        System.out.println(url);
 
         return url.toString();
     }

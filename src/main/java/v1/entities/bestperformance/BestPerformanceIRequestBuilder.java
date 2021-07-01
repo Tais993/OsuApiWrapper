@@ -1,43 +1,44 @@
-package v1.entities.recentlyplayed;
+package v1.entities.bestperformance;
 
 import v1.ApiV1Handler;
-import v1.entities.RequestBuilderV1;
-import v1.entities.global.ModeV1;
+import v1.entities.IRequestBuilder;
+import v1.entities.global.Mode;
 import v1.entities.global.TypeV1;
 
-public class RecentlyPlayedRequestBuilderV1 extends RequestBuilderV1<RecentlyPlayedRequestBuilderV1> {
+public class BestPerformanceIRequestBuilder implements IRequestBuilder<BestPerformanceIRequestBuilder> {
     private String key;
 
     private String user;
     private TypeV1 typeV1;
 
-    private ModeV1 modeV1;
+    private Mode modeV1;
 
     int limit;
 
-    public RecentlyPlayedRequestBuilderV1 setKey(String key) {
+    @Override
+    public BestPerformanceIRequestBuilder setKey(String key) {
         this.key = key;
         return this;
     }
 
-    public RecentlyPlayedRequestBuilderV1 setUsername(String userName) {
+    public BestPerformanceIRequestBuilder setUsername(String userName) {
         this.user = userName;
         this.typeV1 = TypeV1.USERNAME;
         return this;
     }
 
-    public RecentlyPlayedRequestBuilderV1 setUserId(long userId) {
+    public BestPerformanceIRequestBuilder setUserId(long userId) {
         this.user = userId + "";
         this.typeV1 = TypeV1.USER_ID;
         return this;
     }
 
-    public RecentlyPlayedRequestBuilderV1 setMode(ModeV1 modeV1) {
+    public BestPerformanceIRequestBuilder setMode(Mode modeV1) {
         this.modeV1 = modeV1;
         return this;
     }
 
-    public RecentlyPlayedRequestBuilderV1 setLimit(int limit) {
+    public BestPerformanceIRequestBuilder setLimit(int limit) {
         this.limit = limit;
         return this;
     }
@@ -46,7 +47,7 @@ public class RecentlyPlayedRequestBuilderV1 extends RequestBuilderV1<RecentlyPla
     public String getUrl() {
         StringBuilder url = new StringBuilder(ApiV1Handler.startUrl);
 
-        url.append("get_user_recent?k=").append(key);
+        url.append("get_user_best?k=").append(key);
 
         if (typeV1 != null) {
             url.append("&type=").append(typeV1);

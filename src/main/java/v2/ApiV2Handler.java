@@ -29,15 +29,26 @@ public class ApiV2Handler {
     }
 
     public static void main(String[] args) throws IOException {
-        String url = "https://osu.ppy.sh/oauth/token";
+        String url = "https://osu.ppy.sh/api/v2/oauth/authorize";
+        String testUrl = "https://osu.ppy.sh/api/v2/oauth/tokens/current";
 
-        HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
-        con.setRequestMethod("POST");
+        String clientId = "&client_id=5419";
+        String redirectUri = "&redirect_uri=google.com";
+        String responseType = "&response_type=code";
+        String scope = "&scope=bot";
+
+        String fullUrl = url + clientId + redirectUri + responseType + scope;
+        System.out.println(fullUrl);
+
+        HttpURLConnection con = (HttpURLConnection) new URL(fullUrl).openConnection();
+        con.setRequestMethod("GET");
 
         con.addRequestProperty("Accept", "application/json");
         con.addRequestProperty("Content-Type", "application/json");
         con.setDoOutput(true);
 
+
+        @SuppressWarnings("SpellCheckingInspection")
         String jsonInputString = """
                 {
                 grant_type: client_credentials,
@@ -45,46 +56,20 @@ public class ApiV2Handler {
                 client_secret: 0EUXizImCoZU426332SjBmCglzsfJHpsqdxLuRJW,
                 scope: public
                     }""";
-
-        try(OutputStream os = con.getOutputStream()) {
-            byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
-            os.write(input, 0, input.length);
-        }
+//
+//        try(OutputStream os = con.getOutputStream()) {
+//            byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
+//            os.write(input, 0, input.length);
+//        }
 
         con.getOutputStream().flush();
+
+
 
         con.connect();
         String body = getFromInputStream(con.getInputStream());
 
         System.out.println(body);
-        
-
-
-
-//        String url = "https://osu.ppy.sh/api/v2/beatmaps/lookup?id=1241370";
-//
-//        HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
-//        con.setRequestMethod("GET");
-//        con.setRequestProperty("Authorization", "Bearer 0EUXizImCoZU426332SjBmCglzsfJHpsqdxLuRJW");
-//
-//        String body = getFromInputStream(con.getInputStream());
-//
-//        System.out.println(body);
-
-//        HttpRequest httpRequest = HttpRequest.newBuilder()
-//                .setHeader("Authorization", "Bearer 0EUXizImCoZU426332SjBmCglzsfJHpsqdxLuRJW")
-//                .uri(new URI("https://osu.ppy.sh/api/v2/beatmaps/lookup?id=1241370"))
-//                .build();
-//
-//        System.out.println(httpRequest.headers());
-//
-//        System.out.println(HttpClient.newHttpClient()
-//                .send(httpRequest, HttpResponse.BodyHandlers.ofString())
-//                .body());
-//
-//        HashMap<String, String> categories = new LinkedHashMap<>(){
-//
-//        };
     }
 
     private static String getFromInputStream(InputStream inputStream) {
